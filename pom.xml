@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+                             http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.tracelink</groupId>
+    <artifactId>transform-test-harness</artifactId>
+    <version>1.0.0</version>
+    <packaging>jar</packaging>
+
+    <properties>
+        <maven.compiler.source>11</maven.compiler.source>
+        <maven.compiler.target>11</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+        <!--
+            Point this at your Contivo lib folder.
+            Override on the command line if needed:
+              mvn package -Dcontivo.lib=/path/to/your/lib
+        -->
+        <contivo.lib>${project.basedir}/lib</contivo.lib>
+    </properties>
+
+    <dependencies>
+        <!--
+            Contivo runtime — lives in your existing lib/ folder next to the script.
+            Not bundled into the output JAR (scope=provided) because the script's
+            CLASSPATH already includes it at runtime.
+        -->
+        <dependency>
+            <groupId>com.contivo</groupId>
+            <artifactId>mixedruntime</artifactId>
+            <version>21.2</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/lib/Runtime-6.6.3.jar</systemPath>
+        </dependency>
+        
+        <!-- Functional Java dependency for fj.P2 class -->
+        <dependency>
+            <groupId>org.functionaljava</groupId>
+            <artifactId>functionaljava</artifactId>
+            <version>3.1.2</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/lib/functionaljava-3.1.2.jar</systemPath>
+        </dependency>
+        
+        </dependencies>
+
+    <build>
+        <!--
+            Source root is one level up (project/) so Maven resolves
+            com/tracelink/harness/... as package com.tracelink.harness.*
+            Only files inside com/tracelink/ are compiled — src/ is excluded.
+        -->
+        <sourceDirectory>src/main/java</sourceDirectory>
+
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.11.0</version>
+                <configuration>
+                    <includes>
+                        <include>com/tracelink/**/*.java</include>
+                    </includes>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>3.3.0</version>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <mainClass>com.tracelink.harness.execution.TransformExecutor</mainClass>
+                        </manifest>
+                    </archive>
+                    <finalName>transform-test-harness</finalName>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>
